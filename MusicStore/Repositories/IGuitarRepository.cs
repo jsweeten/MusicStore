@@ -8,7 +8,6 @@ namespace MusicStore.Repositories
         List<Guitar> GetAll();
 
         Guitar GetById(int id);
-        List<Guitar> GetByUserId(string firebaseId);
         void Add(Guitar guitar);
     }
 }

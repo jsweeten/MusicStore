@@ -22,47 +22,38 @@ namespace MusicStore.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-               SELECT p.Id, p.Title, p.Content, p.ImageLocation, p.CreateDateTime, p.PublishDateTime,
-                      p.IsApproved, p.UserProfileId, p.CategoryId,
-
-                      up.FireBaseUserId, up.DisplayName, up.FirstName, up.LastName, up.Email, up.CreateDateTime AS UserProfileDateCreated,
-                      up.ImageLocation AS UserProfileImageUrl, up.UserTypeId
-                        
-                 FROM Post p
-                      JOIN UserProfile up ON p.UserProfileId = up.Id
-                WHERE PublishDateTime <= SYSDATETIME() AND IsApproved = 1
-             ORDER BY PublishDateTime DESC
-            "
+                SELECT g.[Id], b.[Name] AS Brand, g.[Name], gt.[Name] AS 'Type', c.[Name] AS 'Category', Strings, NumFrets, Price, ImagePath, Used
+                FROM Guitar g
+                LEFT JOIN Brand b ON b.Id = g.BrandId
+                LEFT JOIN GuitarType gt ON gt.Id = g.GuitarTypeId
+                LEFT JOIN Category c ON c.Id = g.CategoryId;"
                     ;
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-
                         var guitars = new List<Guitar>();
                         while (reader.Read())
                         {
                             guitars.Add(new Guitar()
                             {
                                 Id = DbUtils.GetInt(reader, "Id"),
-                                Title = DbUtils.GetString(reader, "Title"),
-                                Content = DbUtils.GetString(reader, "Content"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                                CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                                PublishDateTime = DbUtils.GetDateTime(reader, "PublishDatetime"),
-                                IsApproved = (bool)reader["IsApproved"],
-                                CategoryId = DbUtils.GetInt(reader, "CategoryId"),
-                                UserProfileId = DbUtils.GetInt(reader, "UserProfileId"),
-                                UserProfile = new UserProfile()
+                                Name = DbUtils.GetString(reader, "Name"),
+                                ImagePath = DbUtils.GetString(reader, "ImagePath"),
+                                NumFrets = DbUtils.GetInt(reader, "NumFrets"),
+                                Strings = DbUtils.GetInt(reader, "Strings"),
+                                Price = DbUtils.GetDouble(reader, "Price"),
+                                Used = (bool)reader["Used"],
+                                Brand = new Brand()
                                 {
-                                    Id = DbUtils.GetInt(reader, "UserProfileId"),
-                                    FirebaseUserId = DbUtils.GetString(reader, "FireBaseUserId"),
-                                    DisplayName = DbUtils.GetString(reader, "DisplayName"),
-                                    LastName = DbUtils.GetString(reader, "LastName"),
-                                    FirstName = DbUtils.GetString(reader, "FirstName"),
-                                    Email = DbUtils.GetString(reader, "Email"),
-                                    CreateDateTime = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
-                                    ImageLocation = DbUtils.GetString(reader, "UserProfileImageUrl"),
-                                    UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
+                                    Name = DbUtils.GetString(reader, "Brand")
+                                },
+                                Category = new Category()
+                                {
+                                    Name = DbUtils.GetString(reader, "Category")
+                                },
+                                GuitarType = new GuitarType()
+                                {
+                                    Name = DbUtils.GetString(reader, "Type")
                                 },
                             });
                         }
@@ -81,108 +72,43 @@ namespace MusicStore.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-            
-            SELECT p.Title, p.Content, p.ImageLocation, p.CreateDateTime, p.PublishDateTime,
-                      p.IsApproved, p.UserProfileId, p.CategoryId,
-
-                      up.FireBaseUserId, up.DisplayName, up.FirstName, up.LastName, up.Email, up.CreateDateTime AS UserProfileDateCreated,
-                      up.ImageLocation AS UserProfileImageUrl, up.UserTypeId
-            FROM Post p
-                      JOIN UserProfile up ON p.UserProfileId = up.Id
-                WHERE p.Id = @Id";
+                SELECT g.[Id], b.[Name] AS Brand, g.[Name], gt.[Name] AS 'Type', c.[Name] AS 'Category', Strings, NumFrets, Price, Used
+                FROM Guitar g
+                LEFT JOIN Brand b ON b.Id = g.BrandId
+                LEFT JOIN GuitarType gt ON gt.Id = g.GuitarTypeId
+                LEFT JOIN Category c ON c.Id = g.CategoryId
+                WHERE g.Id = @Id";
 
                     DbUtils.AddParameter(cmd, "@Id", id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-
                         Guitar guitar = null;
                         if (reader.Read())
                         {
                             guitar = new Guitar()
                             {
-                                Title = DbUtils.GetString(reader, "Title"),
-                                Content = DbUtils.GetString(reader, "Content"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                                CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                                PublishDateTime = DbUtils.GetDateTime(reader, "PublishDatetime"),
-                                IsApproved = (bool)reader["IsApproved"],
-                                CategoryId = DbUtils.GetInt(reader, "CategoryId"),
-                                UserProfileId = DbUtils.GetInt(reader, "UserProfileId"),
-                                UserProfile = new UserProfile()
+                                Id = DbUtils.GetInt(reader, "Id"),
+                                Name = DbUtils.GetString(reader, "Name"),
+                                ImagePath = DbUtils.GetString(reader, "ImagePath"),
+                                NumFrets = DbUtils.GetInt(reader, "NumFrets"),
+                                Strings = DbUtils.GetInt(reader, "Strings"),
+                                Price = DbUtils.GetDouble(reader, "Price"),
+                                Used = (bool)reader["Used"],
+                                Brand = new Brand()
                                 {
-                                    Id = DbUtils.GetInt(reader, "UserProfileId"),
-                                    FirebaseUserId = DbUtils.GetString(reader, "FireBaseUserId"),
-                                    DisplayName = DbUtils.GetString(reader, "DisplayName"),
-                                    LastName = DbUtils.GetString(reader, "LastName"),
-                                    FirstName = DbUtils.GetString(reader, "FirstName"),
-                                    Email = DbUtils.GetString(reader, "Email"),
-                                    CreateDateTime = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
-                                    ImageLocation = DbUtils.GetString(reader, "UserProfileImageUrl"),
-                                    UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
+                                    Name = DbUtils.GetString(reader, "Brand")
+                                },
+                                Category = new Category()
+                                {
+                                    Name = DbUtils.GetString(reader, "Category")
+                                },
+                                GuitarType = new GuitarType()
+                                {
+                                    Name = DbUtils.GetString(reader, "Type")
                                 },
                             };
                         }
                         return guitar;
-                    }
-                }
-            }
-        }
-
-        public List<Guitar> GetByUserId(string firebaseUserId)
-        {
-            using (var conn = Connection)
-            {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-               SELECT p.Id, p.Title, p.Content, p.ImageLocation, p.CreateDateTime, p.PublishDateTime,
-                      p.IsApproved, p.UserProfileId, p.CategoryId,
-
-                      up.FireBaseUserId, up.DisplayName, up.FirstName, up.LastName, up.Email, up.CreateDateTime AS UserProfileDateCreated,
-                      up.ImageLocation AS UserProfileImageUrl, up.UserTypeId
-                        
-                 FROM Post p
-                      JOIN UserProfile up ON p.UserProfileId = up.Id
-                WHERE PublishDateTime <= SYSDATETIME() AND IsApproved = 1 AND up.FireBaseUserId = @firebaseUserId
-             ORDER BY PublishDateTime DESC
-            ";
-
-                    DbUtils.AddParameter(cmd, "@FirebaseUserId", firebaseUserId);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-
-                        var guitars = new List<Guitar>();
-                        while (reader.Read())
-                        {
-                            guitars.Add(new Guitar()
-                            {
-                                Id = DbUtils.GetInt(reader, "Id"),
-                                Title = DbUtils.GetString(reader, "Title"),
-                                Content = DbUtils.GetString(reader, "Content"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                                CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                                PublishDateTime = DbUtils.GetDateTime(reader, "PublishDatetime"),
-                                IsApproved = (bool)reader["IsApproved"],
-                                CategoryId = DbUtils.GetInt(reader, "CategoryId"),
-                                UserProfileId = DbUtils.GetInt(reader, "UserProfileId"),
-                                UserProfile = new UserProfile()
-                                {
-                                    Id = DbUtils.GetInt(reader, "UserProfileId"),
-                                    FirebaseUserId = DbUtils.GetString(reader, "FireBaseUserId"),
-                                    DisplayName = DbUtils.GetString(reader, "DisplayName"),
-                                    LastName = DbUtils.GetString(reader, "LastName"),
-                                    FirstName = DbUtils.GetString(reader, "FirstName"),
-                                    Email = DbUtils.GetString(reader, "Email"),
-                                    CreateDateTime = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
-                                    ImageLocation = DbUtils.GetString(reader, "UserProfileImageUrl"),
-                                    UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
-                                },
-                            });
-                        }
-
-                        return guitars;
                     }
                 }
             }
@@ -197,38 +123,41 @@ namespace MusicStore.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        INSERT INTO Post (
-                        Title,
-                        Content,
-                        ImageLocation,
-                        CreateDateTime,
-                        PublishDateTime,
-                        IsApproved,
+                        INSERT INTO Guitar (
+                        Name,
+                        BrandId,
+                        GuitarTypeId,
                         CategoryId,
-                        UserProfileId
+                        Strings,
+                        NumFrets,
+                        Price,
+                        ImagePath,
+                        Used
                         )
                         
                         OUTPUT INSERTED.ID
 	                    
                         VALUES (
-                        @Title,
-                        @Content,
-                        @ImageLocation,
-                        @CreateDateTime,
-                        @PublishDateTime,
-                        @IsApproved,
+                        @Name,
+                        @BrandId,
+                        @GuitarTypeId,
                         @CategoryId,
-                        @UserProfileId)
+                        @Strings,
+                        @NumFrets,
+                        @Price,
+                        @ImagePath,
+                        @Used)
                     ";
 
-                    DbUtils.AddParameter(cmd, "@Title", post.Title);
-                    DbUtils.AddParameter(cmd, "@Content", post.Content);
-                    DbUtils.AddParameter(cmd, "@ImageLocation", post.ImageLocation);
-                    DbUtils.AddParameter(cmd, "@CreateDateTime", post.CreateDateTime);
-                    DbUtils.AddParameter(cmd, "@PublishDateTime", post.PublishDateTime);
-                    DbUtils.AddParameter(cmd, "@IsApproved", true);
-                    DbUtils.AddParameter(cmd, "@CategoryId", post.CategoryId);
-                    DbUtils.AddParameter(cmd, "@UserProfileId", post.UserProfileId);
+                    DbUtils.AddParameter(cmd, "@Name", guitar.Name);
+                    DbUtils.AddParameter(cmd, "@BrandId", guitar.BrandId);
+                    DbUtils.AddParameter(cmd, "@GuitarTypeId", guitar.GuitarTypeId);
+                    DbUtils.AddParameter(cmd, "@CategoryId", guitar.CategoryId);
+                    DbUtils.AddParameter(cmd, "@Strings", guitar.Strings);
+                    DbUtils.AddParameter(cmd, "@NumFrets", guitar.NumFrets);
+                    DbUtils.AddParameter(cmd, "@Price", guitar.Price);
+                    DbUtils.AddParameter(cmd, "@ImagePath", guitar.ImagePath);
+                    DbUtils.AddParameter(cmd, "@Used", 0);
 
                     guitar.Id = (int)cmd.ExecuteScalar();
                 }

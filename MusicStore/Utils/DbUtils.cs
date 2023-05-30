@@ -36,6 +36,10 @@ namespace MusicStore.Utils
         {
             return reader.GetInt32(reader.GetOrdinal(column));
         }
+        public static int GetDouble(SqlDataReader reader, string column)
+        {
+            return (int)reader.GetDouble(reader.GetOrdinal(column));
+        }
 
         public static bool GetBool(SqlDataReader reader, string column)
         {

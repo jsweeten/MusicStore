@@ -18,8 +18,8 @@ namespace MusicStore.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName, up.DisplayName, 
-                               up.Email, up.CreateDateTime, up.ImageLocation, up.Activated, up.UserTypeId,
+                        SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName, 
+                               up.Email, up.UserTypeId,
                                ut.Name AS UserTypeName
                           FROM UserProfile up
                                LEFT JOIN UserType ut on up.UserTypeId = ut.Id
@@ -38,11 +38,10 @@ namespace MusicStore.Repositories
                             FirebaseUserId = DbUtils.GetString(reader, "FirebaseUserId"),
                             FirstName = DbUtils.GetString(reader, "FirstName"),
                             LastName = DbUtils.GetString(reader, "LastName"),
-                            DisplayName = DbUtils.GetString(reader, "DisplayName"),
                             Email = DbUtils.GetString(reader, "Email"),
-                            CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                            ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                            Activated = DbUtils.GetBool(reader, "Activated"),
+                            // CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
+                            // ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
+                            // Activated = DbUtils.GetBool(reader, "Activated"),
                             UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
                             UserType = new UserType()
                             {
@@ -66,8 +65,8 @@ namespace MusicStore.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName, up.DisplayName, 
-                               up.Email, up.CreateDateTime, up.ImageLocation, up.Activated, up.UserTypeId,
+                        SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName,
+                               up.Email, up.UserTypeId,
                                ut.Name AS UserTypeName
                           FROM UserProfile up
                                LEFT JOIN UserType ut on up.UserTypeId = ut.Id
@@ -86,11 +85,10 @@ namespace MusicStore.Repositories
                             FirebaseUserId = DbUtils.GetString(reader, "FirebaseUserId"),
                             FirstName = DbUtils.GetString(reader, "FirstName"),
                             LastName = DbUtils.GetString(reader, "LastName"),
-                            DisplayName = DbUtils.GetString(reader, "DisplayName"),
                             Email = DbUtils.GetString(reader, "Email"),
-                            CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                            ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                            Activated = DbUtils.GetBool(reader, "Activated"),
+                            // CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
+                            // ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
+                            // Activated = DbUtils.GetBool(reader, "Activated"),
                             UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
                             UserType = new UserType()
                             {
@@ -113,12 +111,11 @@ namespace MusicStore.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName, up.DisplayName, 
-                                               up.Email, up.CreateDateTime, up.ImageLocation, up.Activated, up.UserTypeId,
+                    cmd.CommandText = @"SELECT up.Id, Up.FirebaseUserId, up.FirstName, up.LastName,
+                                               up.Email, up.UserTypeId,
                                                ut.[Name] AS UserTypeName
                                         FROM UserProfile up
-                                        LEFT JOIN UserType ut on up.UserTypeId = ut.Id
-                                        ORDER BY up.DisplayName";
+                                        LEFT JOIN UserType ut on up.UserTypeId = ut.Id;";
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -131,11 +128,10 @@ namespace MusicStore.Repositories
                                 FirebaseUserId = DbUtils.GetString(reader, "FirebaseUserId"),
                                 FirstName = DbUtils.GetString(reader, "FirstName"),
                                 LastName = DbUtils.GetString(reader, "LastName"),
-                                DisplayName = DbUtils.GetString(reader, "DisplayName"),
                                 Email = DbUtils.GetString(reader, "Email"),
-                                CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
-                                ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
-                                Activated = DbUtils.GetBool(reader, "Activated"),
+                                // CreateDateTime = DbUtils.GetDateTime(reader, "CreateDateTime"),
+                                // ImageLocation = DbUtils.GetString(reader, "ImageLocation"),
+                                // Activated = DbUtils.GetBool(reader, "Activated"),
                                 UserTypeId = DbUtils.GetInt(reader, "UserTypeId"),
                                 UserType = new UserType()
                                 {
@@ -157,18 +153,17 @@ namespace MusicStore.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO UserProfile (FirebaseUserId, FirstName, LastName, DisplayName, 
-                                                                 Email, CreateDateTime, ImageLocation, UserTypeId)
+                    cmd.CommandText = @"INSERT INTO UserProfile (FirebaseUserId, FirstName, LastName,
+                                                                 Email, UserTypeId)
                                         OUTPUT INSERTED.ID
-                                        VALUES (@FirebaseUserId, @FirstName, @LastName, @DisplayName, 
-                                                @Email, @CreateDateTime, @ImageLocation, @UserTypeId)";
+                                        VALUES (@FirebaseUserId, @FirstName, @LastName,
+                                                @Email, @UserTypeId)";
                     DbUtils.AddParameter(cmd, "@FirebaseUserId", userProfile.FirebaseUserId);
                     DbUtils.AddParameter(cmd, "@FirstName", userProfile.FirstName);
                     DbUtils.AddParameter(cmd, "@LastName", userProfile.LastName);
-                    DbUtils.AddParameter(cmd, "@DisplayName", userProfile.DisplayName);
                     DbUtils.AddParameter(cmd, "@Email", userProfile.Email);
-                    DbUtils.AddParameter(cmd, "@CreateDateTime", userProfile.CreateDateTime);
-                    DbUtils.AddParameter(cmd, "@ImageLocation", userProfile.ImageLocation);
+                    // DbUtils.AddParameter(cmd, "@CreateDateTime", userProfile.CreateDateTime);
+                    // DbUtils.AddParameter(cmd, "@ImageLocation", userProfile.ImageLocation);
                     DbUtils.AddParameter(cmd, "@UserTypeId", userProfile.UserTypeId);
 
                     userProfile.Id = (int)cmd.ExecuteScalar();
@@ -184,29 +179,25 @@ namespace MusicStore.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"UPDATE UserProfile
-                                        SET Displayname = @displayName,
-                                            FirstName = @firstName,
+                                        SET FirstName = @firstName,
                                             LastName = @lastName,
                                             Email = @email,
-                                            ImageLocation = @imageLocation,
                                             UserTypeId = @userTypeId,
-                                            Activated = @activated
                                         WHERE Id = @id";
-                    DbUtils.AddParameter(cmd, "@displayName", userProfile.DisplayName);
                     DbUtils.AddParameter(cmd, "@firstName", userProfile.FirstName);
                     DbUtils.AddParameter(cmd, "@lastName", userProfile.LastName);
                     DbUtils.AddParameter(cmd, "@email", userProfile.Email);
-                    DbUtils.AddParameter(cmd, "@imageLocation", userProfile.ImageLocation);
+                    // DbUtils.AddParameter(cmd, "@imageLocation", userProfile.ImageLocation);
                     DbUtils.AddParameter(cmd, "@userTypeId", userProfile.UserTypeId);
                     DbUtils.AddParameter(cmd, "@id", userProfile.Id);
-                    if (userProfile.Activated == true)
-                    {
-                        DbUtils.AddParameter(cmd, "@activated", 1);
-                    }
-                    else
-                    {
-                        DbUtils.AddParameter(cmd, "@activated", 0);
-                    }
+                    // if (userProfile.Activated == true)
+                    // {
+                    //    DbUtils.AddParameter(cmd, "@activated", 1);
+                    // }
+                    // else
+                    // {
+                    //     DbUtils.AddParameter(cmd, "@activated", 0);
+                    // }
 
                     cmd.ExecuteNonQuery();
                 }
