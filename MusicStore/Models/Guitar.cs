@@ -1,26 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-public class GuitarContext : DbContext
+
+namespace MusicStore.Models
 {
-    public DbSet<Guitar> Guitars { get; set; }
-
-    public string DbPath { get; }
-
-    public GuitarContext()
+    public class Guitar
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        DbPath = System.IO.Path.Join(path, "guitars.db");
+        public int Id { get; set; }
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlServer($"Data Source={DbPath}");
 }
-
-public class Guitar
-{
-    public int GuitarId { get; set; }
-    public string? Url { get; set; }
-    }
