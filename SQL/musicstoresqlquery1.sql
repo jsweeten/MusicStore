@@ -2,6 +2,7 @@
 SELECT * FROM GuitarType;
 SELECT * FROM Category;
 SELECT * FROM Brand;
+SELECT * FROM Guitar;
 SELECT up.Id, FirstName, LastName, Email, FirebaseUserId, ut.Name
 FROM UserProfile up
 JOIN UserType ut ON UserTypeId = ut.Id
@@ -37,3 +38,45 @@ insert into [GuitarType] ([Id], [Name]) VALUES
 	(3, 'Resonator'),
 	(4, 'Cigar Box')
 set identity_insert [GuitarType] off
+
+insert into [Guitar] ([Id], [Name], BrandId,) VALUES
+	(1, 'Electric'),
+	(2, 'Acoustic'),
+	(3, 'Resonator'),
+	(4, 'Cigar Box')
+
+set identity_insert [Brand] on
+insert into [Brand] ([Id], [Name], Logo) VALUES
+(1, 'C.F. Martin & Co.', '/data/brand-logos/Martin_guitar_logo.png'),
+(2, 'Gibson'),
+(3, 'Fender'),
+(4, 'Taylor'),
+(5, 'Ibanez'),
+(6, 'Epiphone'),
+(7, 'Takamine'),
+(8, 'Breedlove'),
+(9, 'Alvarez'),
+(10, 'Seagull'),
+(11, 'Jackson'),
+(12, 'B.C. Rich'),
+(13, 'Schecter'),
+(14, 'Gretsch'),
+(15, 'Rickenbacker'),
+(16, 'Paul Reed Smith'),
+(17, 'Yamaha'),
+(18, 'ESP'),
+(19, 'Squier'),
+(20, 'Gretsch'),
+(21, 'Washburn'),
+(22, 'Ernie Ball'),
+(23, 'G&L'),
+(24, 'Line 6'),
+(25, 'Ovation')
+set identity_insert [Brand] off
+
+set identity_insert [Guitar] on
+insert into [Guitar] ([Id], [Name], BrandId, GuitarTypeId, CategoryId, Strings, NumFrets, Price, ImagePath, Used) VALUES
+(1, 'Martin Grand Performance Cutaway 15ME with Performing Artist Neck', 1, 2, 1, 6, 22, 2099.99, '/data/brand-logos/Martin_guitar_logo.png', 0)
+set identity_insert [Guitar] off
+
+SELECT * FROM Guitar;
