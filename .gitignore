@@ -480,3 +480,5 @@ $RECYCLE.BIN/
 .env
 
 appsettings.Development.json
+/MusicStore/appsettings.Development.json
+/MusicStore/appsettings.Development.json
